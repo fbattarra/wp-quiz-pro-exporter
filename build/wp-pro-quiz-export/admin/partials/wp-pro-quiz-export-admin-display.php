@@ -11,7 +11,7 @@
  * @subpackage Wp_Pro_Quiz_Export/admin/partials
  */
 global $wpdb;
-$arQuizzes = $wpdb->get_results('SELECT id AS id, CONCAT("[", id, "] ", name) AS name FROM cibq_wp_pro_quiz_master ORDER BY name ASC;', ARRAY_A);
+$arQuizzes = $wpdb->get_results('SELECT id AS id, CONCAT("[", id, "] ", name) AS name FROM cibq_wp_pro_quiz_master WHERE statistics_on = 1 ORDER BY name ASC;', ARRAY_A);
 ?>
 <div class="wrap">
     <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
