@@ -43,7 +43,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
     $arExportFields = array_fill_keys($arExportFields, null);
 
     // quiz properties
-    $quizSQL = 'SELECT * FROM cibq_wp_pro_quiz_master WHERE id=%d;';
+    $quizSQL = 'SELECT * FROM ' . $wpdb->prefix . 'wp_pro_quiz_master WHERE id=%d;';
     $arQuiz = $wpdb->get_results(sprintf($quizSQL, $quizID), ARRAY_A);
     if (!empty($arQuiz)) {
         $arQuiz = array_shift($arQuiz);
@@ -54,13 +54,13 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
     }
 
     // quiz questions
-    $questionsSQL = 'SELECT * FROM cibq_wp_pro_quiz_question WHERE quiz_id=%d ORDER BY sort ASC;';
+    $questionsSQL = 'SELECT * FROM ' . $wpdb->prefix . 'wp_pro_quiz_question WHERE quiz_id=%d ORDER BY sort ASC;';
     foreach ($wpdb->get_results(sprintf($questionsSQL, $quizID), ARRAY_A) as $index => $row) {
         $arQuizQuestions[$row['id']] = $row;
     }
 
     // quiz custom fields
-    $customfieldsSQL = 'SELECT form_id AS id, fieldname AS name FROM cibq_wp_pro_quiz_form WHERE quiz_id=%d ORDER BY sort ASC;';
+    $customfieldsSQL = 'SELECT form_id AS id, fieldname AS name FROM ' . $wpdb->prefix . 'wp_pro_quiz_form WHERE quiz_id=%d ORDER BY sort ASC;';
     foreach ($wpdb->get_results(sprintf($customfieldsSQL, $quizID), ARRAY_A) as $index => $row) {
         $arQuizCustomFields[$row['id']] = $row['name'];
 
@@ -82,8 +82,8 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
                                 qs.answer_data AS answers,
                                 qr.form_data AS quiz_custom_fields_values
                             FROM
-                            cibq_wp_pro_quiz_statistic_ref AS qr
-                                INNER JOIN cibq_wp_pro_quiz_statistic AS qs ON qr.statistic_ref_id = qs.statistic_ref_id
+                            " . $wpdb->prefix . "wp_pro_quiz_statistic_ref AS qr
+                                INNER JOIN " . $wpdb->prefix . "wp_pro_quiz_statistic AS qs ON qr.statistic_ref_id = qs.statistic_ref_id
                             WHERE
                                 qr.quiz_id = %d
                             ORDER BY qr.statistic_ref_id ASC , qs.question_id ASC;";
