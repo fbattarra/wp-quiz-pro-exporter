@@ -15,14 +15,14 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
     $quizID = $_POST[$this->plugin_name . '-quiz'];
 
     // useful URLs to point to for further information about entities retrieved by the query (quiz, question, wp user, ...)
-    $arURLs = [
+    $arURLs = array(
         'quiz_edit' => admin_url('admin.php?page=wpProQuiz&action=addEdit&quizId=%d'),
         'question_edit' => admin_url('admin.php?page=wpProQuiz&module=question&action=addEdit&quiz_id=%d&questionId=%d'),
         'wp_user_edit' => admin_url('user-edit.php?user_id=%d')
-    ];
+    );
 
     // columns of the CSV
-    $arExportFields = [
+    $arExportFields = array(
         'quiz_id',
         'quiz_name',
         'quiz_url',
@@ -39,7 +39,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
         'answer_points',
         'answer_time',
         'answers'
-    ];
+    );
     $arExportFields = array_fill_keys($arExportFields, null);
 
     // quiz properties
@@ -104,7 +104,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
 
         foreach ($arQuizExport as $userID => $arQuestions) {
             foreach ($arQuestions as $questionID => $arAnswer) {
-                $arCSVRow = [
+                $arCSVRow = array(
                     /* quiz_id                */ $arExportFields['quiz_id'],
                     /* quiz_name              */ $arExportFields['quiz_name'],
                     /* quiz_url               */ $arExportFields['quiz_url'],
@@ -121,7 +121,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
                     /* answer_points          */ $arAnswer['answer_points'],
                     /* answer_time            */ gmdate("H:i:s", $arAnswer['answer_time']),
                     /* answers                */ implode(',', json_decode($arAnswer['answers'], true))
-                ];
+                );
 
                 // adding custom fields values
                 if (isset($arQuizCustomFields) && !empty($arQuizCustomFields)) {
