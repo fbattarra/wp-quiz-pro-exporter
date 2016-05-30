@@ -31,6 +31,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
         'question_url',
         'user_id',
         'user_wp_id',
+        'user_wp_login',
         'user_wp_url',
         'user_quiz_completed_at',
         'answer_correct',
@@ -73,6 +74,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
                                 qs.question_id AS question_id,
                                 qr.statistic_ref_id AS user_id,
                                 qr.user_id AS user_wp_id,
+                                u.user_login AS user_wp_login,
                                 qr.create_time AS quiz_completed_at,
                                 qs.correct_count AS answer_correct,
                                 qs.incorrect_count AS answer_incorrect,
@@ -84,6 +86,7 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
                             FROM
                             " . $wpdb->prefix . "wp_pro_quiz_statistic_ref AS qr
                                 INNER JOIN " . $wpdb->prefix . "wp_pro_quiz_statistic AS qs ON qr.statistic_ref_id = qs.statistic_ref_id
+                                LEFT JOIN " . $wpdb->prefix . "users AS u ON qr.user_id = u.id
                             WHERE
                                 qr.quiz_id = %d
                             ORDER BY qr.statistic_ref_id ASC , qs.question_id ASC;";
@@ -105,22 +108,23 @@ if (isset($_POST['checksum']) && wp_verify_nonce($_POST['checksum'], 'csv-export
         foreach ($arQuizExport as $userID => $arQuestions) {
             foreach ($arQuestions as $questionID => $arAnswer) {
                 $arCSVRow = array(
-                    /* quiz_id                */ $arExportFields['quiz_id'],
-                    /* quiz_name              */ $arExportFields['quiz_name'],
-                    /* quiz_url               */ $arExportFields['quiz_url'],
-                    /* question_id            */ $questionID,
-                    /* question_title         */ $arQuizQuestions[$questionID]['title'],
-                    /* question_url           */ sprintf($arURLs['question_edit'], $arExportFields['quiz_id'], $questionID),
-                    /* user_id                */ $arAnswer['user_id'],
-                    /* user_wp_id             */ ($arAnswer['user_wp_id'] > 0) ? $arAnswer['user_wp_id'] : 'n.a.',
-                    /* user_wp_url            */ ($arAnswer['user_wp_id'] > 0) ? sprintf($arURLs['wp_user_edit'], $arAnswer['user_wp_id']) : 'n.a.',
+                    /* quiz_id                            */ $arExportFields['quiz_id'],
+                    /* quiz_name                      */ $arExportFields['quiz_name'],
+                    /* quiz_url                          */ $arExportFields['quiz_url'],
+                    /* question_id                     */ $questionID,
+                    /* question_title                  */ $arQuizQuestions[$questionID]['title'],
+                    /* question_url                    */ sprintf($arURLs['question_edit'], $arExportFields['quiz_id'], $questionID),
+                    /* user_id                            */ $arAnswer['user_id'],
+                    /* user_wp_id                      */ ($arAnswer['user_wp_id'] > 0) ? $arAnswer['user_wp_id'] : 'n.a.',
+                    /* user_wp_login                 */ (\is_null($arAnswer['user_wp_login'])) ? 'n.a.' : $arAnswer['user_wp_login'],
+                    /* user_wp_url                    */ ($arAnswer['user_wp_id'] > 0) ? sprintf($arURLs['wp_user_edit'], $arAnswer['user_wp_id']) : 'n.a.',
                     /* user_quiz_completed_at */ date('d/m/Y H:i:s', $arAnswer['quiz_completed_at']),
-                    /* answer_correct         */ $arAnswer['answer_correct'],
-                    /* answer_incorrect       */ $arAnswer['answer_incorrect'],
-                    /* answer_solved          */ $arAnswer['answer_solved'],
-                    /* answer_points          */ $arAnswer['answer_points'],
-                    /* answer_time            */ gmdate("H:i:s", $arAnswer['answer_time']),
-                    /* answers                */ implode(',', json_decode($arAnswer['answers'], true))
+                    /* answer_correct               */ $arAnswer['answer_correct'],
+                    /* answer_incorrect            */ $arAnswer['answer_incorrect'],
+                    /* answer_solved                */ $arAnswer['answer_solved'],
+                    /* answer_points                */ $arAnswer['answer_points'],
+                    /* answer_time                   */ gmdate("H:i:s", $arAnswer['answer_time']),
+                    /* answers                          */ implode(',', json_decode($arAnswer['answers'], true))
                 );
 
                 // adding custom fields values
